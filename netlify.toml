@@ -4,7 +4,7 @@
 
 [functions]
   directory = "netlify/functions"
-  external_node_modules = ["express", "serverless-http", "@libsql/client", "bcryptjs", "express-session", "cookie-parser", "dotenv"]
+  external_node_modules = ["express", "serverless-http", "@libsql/client", "bcryptjs", "jsonwebtoken", "cookie-parser", "dotenv"]
   node_bundler = "esbuild"
 
 [[redirects]]
