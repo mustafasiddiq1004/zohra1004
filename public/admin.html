@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Panel — Urdu Shayari</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginView">
+  <div class="login-box">
+    <h2>Admin Login</h2>
+    <p class="sub">Sign in to manage your shayari</p>
+    <form id="loginForm">
+      <div style="margin-bottom:16px">
+        <label>USERNAME</label>
+        <input type="text" id="username" autocomplete="username" required>
+      </div>
+      <div style="margin-bottom:22px">
+        <label>PASSWORD</label>
+        <input type="password" id="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn" style="width:100%" type="submit" id="loginBtn">Sign In</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div id="dashView" style="display:none">
+  <div class="wrap">
+
+    <div class="topbar">
+      <h1>Shayari <span>Admin</span></h1>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span class="who">Signed in as <b id="whoUser"></b></span>
+        <button class="btn ghost sm" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="posts">📝 Posts</button>
+      <button class="tab" data-tab="likes">❤️ Likes</button>
+      <button class="tab" data-tab="visits">👁️ Visits</button>
+    </div>
+
+    <!-- ============ POSTS TAB ============ -->
+    <section id="tab-posts">
+      <div class="panel">
+        <h3 id="editorTitle">Post New Shayari</h3>
+        <input type="hidden" id="editId">
+        <div class="editor-grid">
+          <div>
+            <div style="margin-bottom:14px">
+              <label>TITLE (optional)</label>
+              <input type="text" id="postTitle" class="urdu-input"
+                     style="min-height:auto;font-size:1.2rem;padding:10px 14px"
+                     placeholder="عنوان…">
+            </div>
+            <div style="margin-bottom:14px">
+              <label>SHAYARI (Urdu)</label>
+              <textarea id="postContent" class="urdu-input"
+                        placeholder="یہاں اپنی شاعری لکھیں…"></textarea>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn" id="saveBtn">Publish</button>
+              <button class="btn ghost" id="cancelEditBtn" style="display:none">Cancel</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="preview-label">Live Preview</div>
+            <div class="preview-box">
+              <div class="title urdu" id="pvTitle" style="color:var(--gold);margin-bottom:10px"></div>
+              <div class="urdu" id="pvContent" style="color:var(--muted)">پیش نظارہ…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>All Posts</h3>
+        <div id="postsList"><div class="empty">Loading…</div></div>
+      </div>
+    </section>
+
+    <!-- ============ LIKES TAB ============ -->
+    <section id="tab-likes" style="display:none">
+      <div class="panel">
+        <h3>Who Liked Your Posts</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Post</th><th>Liker IP</th>
+                <th>Browser / Device</th><th>Liked At (UTC)</th>
+              </tr>
+            </thead>
+            <tbody id="likesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VISITS TAB ============ -->
+    <section id="tab-visits" style="display:none">
+      <div class="panel">
+        <h3>Visits — Last 7 Days</h3>
+        <div class="chart" id="chart"></div>
+      </div>
+      <div class="panel">
+        <h3>Top Liked Posts</h3>
+        <div id="topPosts"></div>
+      </div>
+      <div class="panel">
+        <h3>Visit Log</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Visitor IP</th><th>Page</th>
+                <th>Browser / Device</th><th>Referrer</th><th>Time (UTC)</th>
+              </tr>
+            </thead>
+            <tbody id="visitsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/admin.js"></script>
+</body>
+</html>

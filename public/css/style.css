@@ -1,0 +1,345 @@
+/* ============ Jameel Noori Nastaleeq (with Google fallback) ============ */
+@font-face {
+  font-family: 'Jameel Noori Nastaleeq';
+  src: url('https://cdn.jsdelivr.net/gh/tariq-abdullah/urdu-web-font-CDN/JameelNooriNastaleeq.woff') format('woff'),
+       url('https://cdn.jsdelivr.net/gh/tariq-abdullah/urdu-web-font-CDN/JameelNooriNastaleeq.ttf')  format('truetype');
+  font-display: swap;
+}
+
+:root {
+  --bg:        #0e0c12;
+  --bg-soft:   #16131c;
+  --card:      #1a1721;
+  --border:    rgba(255,255,255,.08);
+  --text:      #ece9f1;
+  --muted:     #8d8799;
+  --gold:      #d4a24c;
+  --gold-soft: rgba(212,162,76,.12);
+  --rose:      #e0557a;
+  --radius:    16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background:
+    radial-gradient(900px 500px at 15% -10%, #241a33 0%, transparent 60%),
+    radial-gradient(700px 400px at 90% 0%, #1e2436 0%, transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* ---------------- Urdu text ---------------- */
+.urdu {
+  font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+  direction: rtl;
+  text-align: right;
+  line-height: 2.5;
+  font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ---------------- Header ---------------- */
+header.site {
+  text-align: center;
+  padding: 56px 20px 36px;
+}
+header.site h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: .5px;
+  background: linear-gradient(90deg, var(--gold), #f3d79a, var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+header.site p {
+  color: var(--muted);
+  margin-top: 10px;
+  font-size: .95rem;
+}
+header.site a.admin-link {
+  display: inline-block;
+  margin-top: 18px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: .82rem;
+  border: 1px solid var(--border);
+  padding: 7px 16px;
+  border-radius: 999px;
+  transition: .2s;
+}
+header.site a.admin-link:hover { color: var(--gold); border-color: var(--gold); }
+
+/* ---------------- Feed ---------------- */
+.feed {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.card {
+  background: linear-gradient(180deg, var(--card), var(--bg-soft));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 30px 34px 22px;
+  position: relative;
+  overflow: hidden;
+  animation: rise .45s ease both;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--gold), transparent);
+  opacity: .7;
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.card .title {
+  font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+  direction: rtl;
+  text-align: right;
+  color: var(--gold);
+  font-size: 1.15rem;
+  margin-bottom: 12px;
+  opacity: .9;
+}
+
+.card .meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+  font-size: .82rem;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.card .meta .time { display: flex; align-items: center; gap: 7px; }
+
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: .88rem;
+  cursor: pointer;
+  transition: .2s;
+  font-family: inherit;
+}
+.like-btn:hover { border-color: var(--rose); color: var(--rose); transform: translateY(-1px); }
+.like-btn.liked {
+  background: rgba(224,85,122,.14);
+  border-color: var(--rose);
+  color: var(--rose);
+}
+.like-btn .heart { font-size: 1rem; line-height: 1; transition: transform .2s; }
+.like-btn:active .heart { transform: scale(1.45); }
+
+/* ---------------- Admin ---------------- */
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 22px; }
+
+.login-box {
+  max-width: 380px;
+  margin: 90px auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+}
+.login-box h2 { font-size: 1.3rem; margin-bottom: 6px; }
+.login-box p.sub { color: var(--muted); font-size: .85rem; margin-bottom: 24px; }
+
+label { display: block; font-size: .78rem; color: var(--muted); margin-bottom: 7px; letter-spacing: .4px; }
+
+input[type=text], input[type=password], textarea {
+  width: 100%;
+  background: #100e15;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 12px 14px;
+  font-size: .92rem;
+  font-family: inherit;
+  outline: none;
+  transition: .2s;
+}
+input:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+
+textarea.urdu-input {
+  font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+  direction: rtl;
+  text-align: right;
+  font-size: 1.35rem;
+  line-height: 2.3;
+  min-height: 150px;
+  resize: vertical;
+}
+
+.btn {
+  background: linear-gradient(135deg, var(--gold), #b9863a);
+  color: #1a1206;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-weight: 600;
+  font-size: .9rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: .2s;
+}
+.btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn.ghost:hover { color: var(--text); border-color: var(--text); }
+.btn.danger { background: transparent; border: 1px solid rgba(224,85,122,.5); color: var(--rose); }
+.btn.danger:hover { background: rgba(224,85,122,.12); }
+.btn.sm { padding: 7px 14px; font-size: .78rem; }
+
+/* Topbar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.topbar h1 { font-size: 1.25rem; }
+.topbar h1 span { color: var(--gold); }
+.topbar .who { color: var(--muted); font-size: .82rem; }
+
+/* Stat cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+.stat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+.stat .label { font-size: .72rem; text-transform: uppercase; letter-spacing: .9px; color: var(--muted); }
+.stat .value { font-size: 1.9rem; font-weight: 700; margin-top: 8px; color: var(--gold); }
+
+/* Panel */
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.panel h3 { font-size: 1rem; margin-bottom: 18px; display: flex; align-items: center; gap: 9px; }
+.panel h3::before { content: ''; width: 4px; height: 16px; background: var(--gold); border-radius: 3px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.tab {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 9px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: .84rem;
+  font-family: inherit;
+  transition: .2s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
+
+/* Chart */
+.chart { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 10px; }
+.chart .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+.chart .bar {
+  width: 100%;
+  background: linear-gradient(180deg, var(--gold), rgba(212,162,76,.25));
+  border-radius: 6px 6px 3px 3px;
+  min-height: 4px;
+  transition: .3s;
+  position: relative;
+}
+.chart .bar:hover { filter: brightness(1.25); }
+.chart .bar-label { font-size: .68rem; color: var(--muted); white-space: nowrap; }
+
+/* Table */
+.table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: #131019; color: var(--muted); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .7px; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,.02); }
+td.mono { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .78rem; color: var(--gold); }
+td.ua { font-family: ui-monospace, monospace; font-size: .76rem; color: var(--muted); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Post editor */
+.editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 820px) { .editor-grid { grid-template-columns: 1fr; } }
+.preview-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .9px; color: var(--muted); margin-bottom: 10px; }
+.preview-box {
+  background: #100e15;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  min-height: 150px;
+}
+
+.post-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.post-row:last-child { border-bottom: none; }
+.post-row .urdu { font-size: 1.15rem; line-height: 2.2; flex: 1; }
+.post-row .actions { display: flex; gap: 8px; flex-shrink: 0; }
+.post-row .count { color: var(--rose); font-size: .78rem; white-space: nowrap; }
+
+.empty { text-align: center; color: var(--muted); padding: 40px 20px; font-size: .9rem; }
+
+.toast {
+  position: fixed;
+  bottom: 26px; left: 50%;
+  transform: translateX(-50%) translateY(120%);
+  background: var(--card);
+  border: 1px solid var(--gold);
+  color: var(--text);
+  padding: 13px 26px;
+  border-radius: 999px;
+  font-size: .86rem;
+  transition: transform .35s cubic-bezier(.2,.9,.3,1.4);
+  z-index: 999;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.err { border-color: var(--rose); }
+
+@media (max-width: 600px) {
+  .card { padding: 24px 20px 18px; }
+  .feed { padding: 0 14px; }
+}
