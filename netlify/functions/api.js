@@ -1,23 +1,21 @@
 import express from 'express';
 import serverless from 'serverless-http';
-import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import db from '../../db.js';
 
 dotenv.config();
 
 const app = express();
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-jwt-secret-change-me';
+const COOKIE_NAME = 'shayari_admin';
+const COOKIE_MAX_AGE = 1000 * 60 * 60 * 8; // 8 hours
 
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 8 }
-}));
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -30,9 +28,30 @@ function getClientIp(req) {
   return ip;
 }
 
+function setAuthCookie(res, token) {
+  res.cookie(COOKIE_NAME, token, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: true,
+    maxAge: COOKIE_MAX_AGE,
+    path: '/',
+  });
+}
+
+function clearAuthCookie(res) {
+  res.clearCookie(COOKIE_NAME, { path: '/' });
+}
+
 function requireAdmin(req, res, next) {
-  if (req.session?.adminId) return next();
-  return res.status(401).json({ error: 'Unauthorized' });
+  const token = req.cookies?.[COOKIE_NAME];
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.admin = payload;
+    return next();
+  } catch {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -78,7 +97,10 @@ app.post('/api/posts/:id/like', async (req, res) => {
   const postResult = await db.execute({ sql: 'SELECT id FROM posts WHERE id = ?', args: [postId] });
   if (postResult.rows.length === 0) return res.status(404).json({ error: 'Post not found' });
 
-  const existingResult = await db.execute({ sql: 'SELECT id FROM likes WHERE post_id = ? AND ip = ?', args: [postId, ip] });
+  const existingResult = await db.execute({
+    sql: 'SELECT id FROM likes WHERE post_id = ? AND ip = ?',
+    args: [postId, ip]
+  });
 
   if (existingResult.rows.length > 0) {
     await db.execute({ sql: 'DELETE FROM likes WHERE id = ?', args: [existingResult.rows[0].id] });
@@ -89,7 +111,10 @@ app.post('/api/posts/:id/like', async (req, res) => {
     });
   }
 
-  const countResult = await db.execute({ sql: 'SELECT COUNT(*) AS c FROM likes WHERE post_id = ?', args: [postId] });
+  const countResult = await db.execute({
+    sql: 'SELECT COUNT(*) AS c FROM likes WHERE post_id = ?',
+    args: [postId]
+  });
   res.json({ liked: existingResult.rows.length === 0, like_count: countResult.rows[0].c });
 });
 
@@ -102,33 +127,50 @@ app.post('/api/track-visit', async (req, res) => {
 });
 
 /* ------------------------------------------------------------------ */
-/* AUTH                                                                */
+/* AUTH (JWT — no sessions)                                            */
 /* ------------------------------------------------------------------ */
+
 app.post('/api/admin/login', async (req, res) => {
   const { username, password } = req.body || {};
-  const result = await db.execute({ sql: 'SELECT * FROM admins WHERE username = ?', args: [username] });
+  const result = await db.execute({
+    sql: 'SELECT * FROM admins WHERE username = ?',
+    args: [username]
+  });
   const admin = result.rows[0];
 
   if (!admin || !bcrypt.compareSync(password || '', admin.password_hash)) {
     return res.status(401).json({ error: 'Invalid username or password' });
   }
-  req.session.adminId   = admin.id;
-  req.session.adminUser = admin.username;
+
+  const token = jwt.sign(
+    { id: admin.id, username: admin.username },
+    JWT_SECRET,
+    { expiresIn: '8h' }
+  );
+  setAuthCookie(res, token);
   res.json({ ok: true, username: admin.username });
 });
 
 app.post('/api/admin/logout', (req, res) => {
-  req.session.destroy(() => res.json({ ok: true }));
+  clearAuthCookie(res);
+  res.json({ ok: true });
 });
 
 app.get('/api/admin/me', (req, res) => {
-  if (req.session?.adminId) return res.json({ loggedIn: true, username: req.session.adminUser });
-  res.json({ loggedIn: false });
+  const token = req.cookies?.[COOKIE_NAME];
+  if (!token) return res.json({ loggedIn: false });
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    return res.json({ loggedIn: true, username: payload.username });
+  } catch {
+    return res.json({ loggedIn: false });
+  }
 });
 
 /* ------------------------------------------------------------------ */
 /* ADMIN — POSTS                                                       */
 /* ------------------------------------------------------------------ */
+
 app.get('/api/admin/posts', requireAdmin, async (req, res) => {
   const result = await db.execute(`
     SELECT p.*, (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS like_count
@@ -145,7 +187,10 @@ app.post('/api/admin/posts', requireAdmin, async (req, res) => {
     sql: 'INSERT INTO posts (title, content) VALUES (?, ?)',
     args: [title.trim(), content.trim()]
   });
-  const postResult = await db.execute({ sql: 'SELECT * FROM posts WHERE id = ?', args: [result.lastInsertRowid] });
+  const postResult = await db.execute({
+    sql: 'SELECT * FROM posts WHERE id = ?',
+    args: [result.lastInsertRowid]
+  });
   res.json(postResult.rows[0]);
 });
 
@@ -175,6 +220,7 @@ app.delete('/api/admin/posts/:id', requireAdmin, async (req, res) => {
 /* ------------------------------------------------------------------ */
 /* ADMIN — ANALYTICS (IST-aware)                                       */
 /* ------------------------------------------------------------------ */
+
 app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   const IST = "'+330 minutes'";
   const [totalPosts, totalLikes, totalVisits, uniqueVisitors, visitsToday, likesToday] = await Promise.all([
